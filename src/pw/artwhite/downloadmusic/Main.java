@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * Created by artwhite on 05/12/2017.
+ * Главный класс
  */
 public class Main {
     private static final String IN_FILE_TXT = "src/pw/artwhite/downloadmusic/inFile.txt";
@@ -25,10 +25,15 @@ public class Main {
                     result = bufferedReader.lines().collect(Collectors.joining("\n"));
                 }
                 Pattern email_pattern = Pattern.compile("\\s*(?<=data-url\\s?=\\s?\")[^>]*\\/*(?=\")");
+                Pattern name_pattern = Pattern.compile("<span class=\"artist\">(.*?)<\\/span>");
+                Pattern song_pattern = Pattern.compile("<span class=\"track\">(.*?)<\\/span>");
                 Matcher matcher = email_pattern.matcher(result);
-                while (matcher.find()) {
-                    outFile.write(matcher.group() + "\r\n");
-                }
+                Matcher matcherName = name_pattern.matcher(result);
+                Matcher matcherSong = song_pattern.matcher(result);
+
+                while (matcher.find() && matcherName.find() && matcherSong.find()) {
+                    outFile.write("name: " + matcherName.group(1) + " - " + matcherSong.group(1) + ", url: " + matcher.group() + ";\r\n");
+               }
             }
         } catch (IOException e) {
             e.printStackTrace();
